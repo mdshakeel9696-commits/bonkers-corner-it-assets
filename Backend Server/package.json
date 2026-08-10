@@ -1,0 +1,13 @@
+{
+  "name": "bonkers-corner-it-assets",
+  "version": "1.0.0",
+  "description": "IT Asset Management for Bonkers Corner",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "nodemailer": "^6.9.13"
+  }
+}

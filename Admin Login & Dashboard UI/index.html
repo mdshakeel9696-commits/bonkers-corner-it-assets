@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bonkers Corner IT Assets</title>
+    <style>
+        body { background-color: #121212; color: #fff; font-family: Arial, sans-serif; margin: 0; display: flex; }
+        .sidebar { width: 260px; background: #1e1e1e; height: 100vh; padding: 20px; box-sizing: border-box; }
+        .sidebar h2 { font-size: 15px; color: #00bcd4; line-height: 1.4; }
+        .main { flex: 1; padding: 40px; box-sizing: border-box; overflow-y: auto; height: 100vh; }
+        .card { background: #1e1e1e; padding: 25px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        input, select { background: #2d2d2d; border: 1px solid #444; color: #fff; padding: 10px; width: 100%; margin-bottom: 15px; border-radius: 4px; box-sizing: border-box; }
+        button { background: #00bcd4; color: #000; border: none; padding: 12px 20px; font-weight: bold; cursor: pointer; border-radius: 4px; width: 100%; }
+        button:hover { background: #008ba3; }
+        .hidden { display: none; }
+        .link { color: #00bcd4; cursor: pointer; text-decoration: underline; font-size: 13px; }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <h2>BONKERS CORNER<br><span style="font-size: 11px; color: #888;">IT ASSET MANAGER</span></h2>
+        <ul style="list-style: none; padding: 0; margin-top: 30px;">
+            <li style="margin: 15px 0;"><a href="#" style="color: #fff; text-decoration: none;">📊 Dashboard</a></li>
+            <li style="margin: 15px 0;"><a href="#" style="color: #fff; text-decoration: none;">💻 Assets</a></li>
+            <li style="margin: 15px 0;"><a href="#" style="color: #fff; text-decoration: none;">👥 Employees & Emails</a></li>
+        </ul>
+    </div>
+
+    <!-- MAIN CONTENT AREA -->
+    <div class="main">
+        
+        <!-- LOGIN SECTION -->
+        <div id="loginSection" class="card" style="max-width: 400px; margin: auto;">
+            <h3>Admin Authentication</h3>
+            <p style="font-size: 12px; color: #aaa;">Default: admin / Password123</p>
+            <input type="text" id="loginUser" placeholder="Admin Username">
+            <input type="password" id="loginPass" placeholder="Password">
+            <button onclick="handleLogin()">Login to Dashboard</button>
+            <p style="margin-top: 15px; text-align: center;"><span class="link" onclick="toggleResetModal(true)">Forgot / Reset Password?</span></p>
+        </div>
+
+        <!-- PASSWORD RESET SECTION (Hidden by default) -->
+        <div id="resetSection" class="card hidden" style="max-width: 400px; margin: auto;">
+            <h3>Reset Admin Password</h3>
+            <input type="email" id="resetEmail" placeholder="Enter Admin Email">
+            <input type="password" id="newPass" placeholder="Enter New Password">
+            <button onclick="handleReset()">Update Password</button>
+            <p style="margin-top: 15px; text-align: center;"><span class="link" onclick="toggleResetModal(false)">Back to Login</span></p>
+        </div>
+
+        <!-- DASHBOARD WORKSPACE (Hidden until login) -->
+        <div id="dashboardSection" class="hidden">
+            <h1>Operations Console</h1>
+            <p style="color: #888;">Tracking inventory and asset allocation (Payment fields removed).</p>
+
+            <div class="card">
+                <h3>Add New Asset & Auto-Mail User</h3>
+                <input type="text" id="assetName" placeholder="Asset Name (e.g. MacBook Pro)">
+                <input type="text" id="assetTag" placeholder="Asset Tag (e.g. BC-L456)">
+                <select id="assetCategory">
+                    <option value="hardware">Hardware</option>
+                    <option value="software">Software</option>
+                    <option value="network">Network</option>
+                    <option value="accessory">Accessory</option>
+                </select>
+                <select id="assetStatus">
+                    <option value="available">Available</option>
+                    <option value="in-use">In-Use</option>
+                    <option value="in-repair">In-Repair</option>
+                </select>
+                <input type="email" id="userEmail" placeholder="User Email Address (For automated mail delivery)">
+                <input type="text" id="assetLocation" placeholder="Location (e.g. Mumbai HQ)">
+                <button onclick="createAsset()">Create Asset & Send Email</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function handleLogin() {
+            const username = document.getElementById('loginUser').value;
+            const password = document.getElementById('loginPass').value;
+
+            fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            }).then(res => res.json()).then(data => {
+                if (data.success) {
+                    document.getElementById('loginSection').classList.add('hidden');
+                    document.getElementById('dashboardSection').classList.remove('hidden');
+                } else {
+                    alert(data.message);
+                }
+            });
+        }
+
+        function toggleResetModal(show) {
+            if(show) {
+                document.getElementById('loginSection').classList.add('hidden');
+                document.getElementById('resetSection').classList.remove('hidden');
+            } else {
+                document.getElementById('resetSection').classList.add('hidden');
+                document.getElementById('loginSection').classList.remove('hidden');
+            }
+        }
+
+        function handleReset() {
+            const email = document.getElementById('resetEmail').value;
+            const newPassword = document.getElementById('newPass').value;
+
+            fetch('/api/reset-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, newPassword })
+            }).then(res => res.json()).then(data => {
+                alert(data.message);
+                if(data.success) toggleResetModal(false);
+            });
+        }
+
+        function createAsset() {
+            const data = {
+                name: document.getElementById('assetName').value,
+                assetTag: document.getElementById('assetTag').value,
+                category: document.getElementById('assetCategory').value,
+                status: document.getElementById('assetStatus').value,
+                userEmail: document.getElementById('userEmail').value,
+                location: document.getElementById('assetLocation').value
+            };
+
+            fetch('/api/assets', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            }).then(res => res.json()).then(response => {
+                alert('Asset added successfully! Email notification dispatched to user.');
+                // Clear fields
+                document.getElementById('assetName').value = '';
+                document.getElementById('assetTag').value = '';
+                document.getElementById('userEmail').value = '';
+            });
+        }
+    </script>
+</body>
+</html>
