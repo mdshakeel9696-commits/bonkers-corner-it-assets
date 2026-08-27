@@ -1,20 +1,9 @@
-const express = require('express');
 const path = require('path');
-const app = express();
 
-// Middleware
-app.use(express.json());
-
-// Serve static files from root directory
-app.use(express.static(__dirname));
-
-// Direct root route to index.html
+// Point to index.html in the 'Admin Login & Dashboard UI' directory
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
+  res.sendFile(path.join(__dirname, '../Admin Login & Dashboard UI/index.html'));
 });
 
-// Dynamic port for Render deployment
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`IT Asset Server running on port ${PORT}`);
-});
+// Serve all static assets (CSS, JS, images) from that folder as well
+app.use(express.static(path.join(__dirname, '../Admin Login & Dashboard UI')));
