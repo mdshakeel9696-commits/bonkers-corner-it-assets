@@ -1,9 +1,23 @@
+const express = require('express');
 const path = require('path');
+const app = express();
 
-// Point to index.html in the 'Admin Login & Dashboard UI' directory
+app.use(express.json());
+
+// Serve static assets from the frontend folder
+app.use(express.static(path.join(__dirname, '../Admin Login & Dashboard UI')));
+
+// Send index.html when visitors access the root URL
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../Admin Login & Dashboard UI/index.html'));
 });
 
-// Serve all static assets (CSS, JS, images) from that folder as well
-app.use(express.static(path.join(__dirname, '../Admin Login & Dashboard UI')));
+// Fallback route for any unhandled requests
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../Admin Login & Dashboard UI/index.html'));
+});
+
+const PORT = process.env.PORT || 10000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
